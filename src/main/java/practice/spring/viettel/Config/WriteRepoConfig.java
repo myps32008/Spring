@@ -38,7 +38,7 @@ public class WriteRepoConfig {
     public LocalContainerEntityManagerFactoryBean repoWriteEntityManager() {
         final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(writeDataSource());
-        em.setPackagesToScan("practice.spring.viettel.Contract.RepoWrite");
+        em.setPackagesToScan("practice.spring.viettel.Entity");
 
         final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
