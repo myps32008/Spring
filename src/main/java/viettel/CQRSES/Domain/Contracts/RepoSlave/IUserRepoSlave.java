@@ -3,13 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package practice.spring.viettel.Contract.RepoWrite;
+package viettel.CQRSES.Domain.Contracts.RepoSlave;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
-import practice.spring.viettel.Entity.User;
+import viettel.CQRSES.Domain.Entities.User;
 
-
-public interface IUserWriteRepo extends JpaRepository<User, Integer> {
+public interface IUserRepoSlave extends JpaRepository<User,Integer> {
     
 }

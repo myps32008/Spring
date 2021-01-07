@@ -3,17 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package practice.spring.viettel.Contract.Service;
-
-import practice.spring.viettel.Entity.User;
-
+package viettel.CQRSES.Domain.Contracts.Projections;
 
 /**
  *
  * @author Admin
  */
-
-public interface IUserService {
-    Iterable<User> getListUser();
-    boolean addUser();
+public interface IUserProjection {
+    
 }

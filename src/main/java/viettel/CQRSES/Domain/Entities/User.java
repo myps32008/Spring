@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package practice.spring.viettel.Entity;
+package viettel.CQRSES.Domain.Entities;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -18,7 +18,6 @@ import javax.persistence.*;
 @Entity
 //@Table(name = "user")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -29,3 +28,4 @@ public class User {
         this.username = name;
     }
 }
+

@@ -3,9 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package practice.spring.viettel.Config;
-
-import javax.sql.DataSource;
+package viettel.CQRSES.Config.DbConnection;
 
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,51 +15,52 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-//import java.util.HashMap;
 
-/**
- *
- * @author Admin
- */
+import java.util.HashMap;
+import javax.sql.DataSource;
+
 @Configuration
-@PropertySource({"classpath:read-writeDB.properties"})
-@EnableJpaRepositories(basePackages = "practice.spring.viettel.Contract.RepoRead",
-        entityManagerFactoryRef = "repoReadEntityManager",
-        transactionManagerRef = "repoReadTransactionManager")
-public class ReadRepoConfig {
+@PropertySource({"classpath:db-config.properties"})
+@EnableJpaRepositories(basePackages = "viettel.CQRSES.Domain.Contracts.RepoMaster",
+        entityManagerFactoryRef = "repoMasterEntityManager",
+        transactionManagerRef = "repoMasterTransactionManager")
+public class MasterDbSourceConfig {
+
     private final Environment env;
-    public ReadRepoConfig(Environment env) {
+
+    public MasterDbSourceConfig(Environment env) {
         this.env = env;
     }
+
     @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean repoReadEntityManager() {
+    @ConfigurationProperties(prefix = "spring.second-datasource")
+    public DataSource masterDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Primary
+    @Bean
+    public LocalContainerEntityManagerFactoryBean repoMasterEntityManager() {
         final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(readDataSource());
-        em.setPackagesToScan("practice.spring.viettel.Entity");
+        em.setDataSource(masterDataSource());
+        em.setPackagesToScan("viettel.CQRSES.Domain.Entities");
 
         final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
-//        final HashMap<String, Object> properties = new HashMap<String, Object>();
-//        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
-//        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
-//        em.setJpaPropertyMap(properties);
+        final HashMap<String, Object> properties = new HashMap<String, Object>();
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+        em.setJpaPropertyMap(properties);
 
         return em;
     }
 
     @Primary
     @Bean
-    @ConfigurationProperties(prefix = "spring.second-datasource")
-    public DataSource readDataSource() {
-        return DataSourceBuilder.create().build();
-    }
-
-    @Primary
-    @Bean
-    public PlatformTransactionManager repoReadTransactionManager() {
+    public PlatformTransactionManager repoMasterTransactionManager() {
         final JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(repoReadEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(repoMasterEntityManager().getObject());
         return transactionManager;
     }
 }
