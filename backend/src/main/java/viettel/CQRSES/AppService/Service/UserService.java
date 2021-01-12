@@ -1,6 +1,7 @@
 package viettel.CQRSES.AppService.Service;
 
 import org.springframework.stereotype.Service;
+
 import viettel.CQRSES.Domain.Contracts.Aggregates.IUserAggregate;
 import viettel.CQRSES.Domain.Contracts.Projectors.IUserProjector;
 import viettel.CQRSES.Domain.Contracts.Services.IUserService;
@@ -18,6 +19,6 @@ public class UserService implements IUserService {
         return userAggregate.handleCreateUser(user);
     }
     public boolean handleDelete(int id) {
-        return true;
+        return userAggregate.handleDelete(id);
     }
 }

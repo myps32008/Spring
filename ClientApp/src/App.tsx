@@ -10,6 +10,7 @@ import {
 import { useSelector } from 'react-redux';
 import LoginForm from './features/login/login';
 import {isExistActiveToken} from './features/login/loginSlice';
+import Test from './features/reactive/test';
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
           <Switch>        
             <Route path="/login" component={LoginForm}/>            
             <RouteAuthen>
-              <Route path="/"/>
+              <Route path="/" component={Test}/>
             </RouteAuthen>
           </Switch>          
         </Router>
@@ -27,7 +28,8 @@ function App() {
 }
 
 function RouteAuthen({children, ...rest}:any) {    
-  const isAuthen = useSelector(isExistActiveToken);
+  // const isAuthen = useSelector(isExistActiveToken);
+  const isAuthen = true;
   return (
     <Route
       {...rest}

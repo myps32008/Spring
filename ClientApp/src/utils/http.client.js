@@ -3,7 +3,7 @@ import Cookies from 'universal-cookie';
 
 const base_url = process.env.NODE_ENV === "production" ? 
     "" : 
-    "https://localhost:44326/";
+    "http://localhost:8080/";
 
 const http_instance = axios.create({
     baseURL: `${base_url}`
