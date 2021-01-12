@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import viettel.CQRSES.Domain.Entities.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +23,16 @@ public class KafkaProducerConfig {
     @Value(value = "${kafka.bootstrapAddress}")
     private String bootstrapAddress;
 
-    @Bean
-    public ProducerFactory<String, String> producerFactory() {
+    private Map<String, Object> defaultConfig(){
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        return new DefaultKafkaProducerFactory<>(configProps);
+        return configProps;
+    }
+    @Bean
+    public ProducerFactory<String, String> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(defaultConfig());
     }
 
     @Bean
@@ -36,4 +40,12 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
+    @Bean
+    public KafkaTemplate<String, User> userKafkaTemplate() {
+        return new KafkaTemplate<String, User>(producerUserFactory());
+    }
+    @Bean
+    public ProducerFactory<String, User> producerUserFactory() {
+        return new DefaultKafkaProducerFactory<>(defaultConfig());
+    }
 }

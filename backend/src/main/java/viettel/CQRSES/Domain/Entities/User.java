@@ -27,5 +27,9 @@ public class User {
     public void setUserName(String name) {
         this.username = name;
     }
+
+    public int getId() {
+        return id;
+    }
 }
 

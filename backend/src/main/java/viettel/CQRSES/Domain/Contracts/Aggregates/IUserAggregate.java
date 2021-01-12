@@ -6,6 +6,9 @@
 package viettel.CQRSES.Domain.Contracts.Aggregates;
 
 
+import viettel.CQRSES.Domain.Entities.User;
+
 public interface IUserAggregate {
-    
+    User handleCreateUser(User user);
+    boolean handleDelete(int id);
 }
