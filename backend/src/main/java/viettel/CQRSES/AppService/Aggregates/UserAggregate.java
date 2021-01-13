@@ -32,10 +32,10 @@ public class UserAggregate implements IUserAggregate {
             LOGGER.info(ex.getMessage());
             return null;
         }
-        BaseEvent<User> event = new BaseEvent<>();
+        BaseEvent event = new BaseEvent();
         event.setId(UserManagementCommand.INSERT_USER.toString());
         event.setValue(user);
-        userProducer.sendMessageInsertUser(event);
+        userProducer.sendMessage(event);
         return user;
     }
     public boolean handleDelete(int id) {
@@ -48,10 +48,10 @@ public class UserAggregate implements IUserAggregate {
             return false;
         }
         if (user != null) {
-            BaseEvent<String> event = new BaseEvent<>();
+            BaseEvent event = new BaseEvent();
             event.setId(UserManagementCommand.DELETE_USER.toString());
             event.setValue(String.valueOf(id));
-            userProducer.sendMessageDeleteUser(event);
+            userProducer.sendMessage(event);
         }
         return true;
     }

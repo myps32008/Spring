@@ -5,10 +5,10 @@
  */
 package viettel.CQRSES.Events;
 
-public class BaseEvent<T> {
+public class BaseEvent {
 
     protected String id;
-    private T value;
+    private Object value;
 
     public void setId(String id) {
         this.id = id;
@@ -18,11 +18,11 @@ public class BaseEvent<T> {
         return id;
     }
 
-    public void setValue(T value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
-    public T getValue() {
+    public Object getValue() {
         return value;
     }
 }
