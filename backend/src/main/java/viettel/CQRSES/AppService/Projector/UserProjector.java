@@ -33,12 +33,12 @@ public class UserProjector implements IUserProjector {
         return userRepoSlave.findAll();
     }
 
-    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "filterUserInsertKLCF")
-    private void listenInsert(String message) {
+    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "userKLCF")
+    private void listenInsert(User user) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            User user = mapper.readValue(message, User.class);
-            temp.put("", user);
+//            User user = mapper.readValue(message, User.class);
+            temp.put(String.valueOf(user.getId()), user);
         } catch (Exception e) {
             LOGGER.info(e.getMessage() + e.getStackTrace());
         }

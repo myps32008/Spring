@@ -7,6 +7,8 @@ import viettel.CQRSES.Domain.Contracts.Projectors.IUserProjector;
 import viettel.CQRSES.Domain.Contracts.Services.IUserService;
 import viettel.CQRSES.Domain.Entities.User;
 
+import java.util.Optional;
+
 @Service
 public class UserService implements IUserService {
     private final IUserAggregate userAggregate;
@@ -20,5 +22,11 @@ public class UserService implements IUserService {
     }
     public boolean handleDelete(int id) {
         return userAggregate.handleDelete(id);
+    }
+    public Iterable<User> getAll() {
+        return userProjector.getAll();
+    }
+    public Optional<User> findById (int id) {
+        return userProjector.findById(id);
     }
 }

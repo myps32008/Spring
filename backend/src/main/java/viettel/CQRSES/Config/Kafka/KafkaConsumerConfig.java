@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import viettel.CQRSES.Domain.Entities.User;
 import viettel.CQRSES.Events.UserManagementCommand;
 
 import java.util.HashMap;
@@ -44,7 +46,13 @@ public class KafkaConsumerConfig {
                 StringDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
-
+    public ConsumerFactory<String, User> userConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "greeting");
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(User.class));
+    }
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String>
             kafkaListenerContainerFactory() {
 
@@ -53,7 +61,15 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, User>
+    userKLCF() {
 
+        ConcurrentKafkaListenerContainerFactory<String, User> factory
+                = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(userConsumerFactory());
+        return factory;
+    }
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> filterUserInsertKLCF() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = kafkaListenerContainerFactory();
