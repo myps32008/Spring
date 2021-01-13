@@ -34,7 +34,7 @@ public class UserController {
         return Mono.just(userService.handleInsert(user));
     }
     private Flux<Iterable<User>> createBridge() {
-        Flux<Iterable<User>> bridge = Flux.create(sink -> { // (2)
+        Flux<Iterable<User>> bridge = Flux.create(sink -> {
             userService.register(new IEventListener<Iterable<User>>() {
 
                 @Override

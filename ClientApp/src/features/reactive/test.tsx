@@ -29,7 +29,17 @@ const Test = (props: any) => {
       key: 'address',
     },
   ];
+  const socket = new WebSocket('ws://localhost:3000/ws/profiles'); 
+  const reactive = async () => {
+    const response = await fetch('http://localhost:3000/profiles');
+    const data = await response.json();
+    setDataSource(data);    
+    socket.addEventListener('message', async (event: any) => { 
+      setDataSource(event); 
+    });
+  }
   useEffect(() => {
+    reactive();
     http.internal
       .get("/api/users/getAll")
       .then(result => {
