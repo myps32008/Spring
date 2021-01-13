@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import viettel.CQRSES.Domain.Contracts.Projectors.IUserProjector;
 import viettel.CQRSES.Domain.Contracts.RepoSlave.IUserRepoSlave;
 import viettel.CQRSES.Domain.Entities.User;
+import viettel.CQRSES.Events.IEventListener;
 
 import java.util.*;
 
@@ -17,11 +18,13 @@ public class UserProjector implements IUserProjector {
     private final IUserRepoSlave userRepoSlave;
     private Map<String, User> temp = new HashMap<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(UserProjector.class);
-
+    private IEventListener listener;
     public UserProjector(IUserRepoSlave userRepoSlave) {
         this.userRepoSlave = userRepoSlave;
     }
-
+    public void register(IEventListener listener){
+        this.listener = listener;
+    }
     @Override
     public Optional<User> findById(int id) {
         User user = temp.get(id);
@@ -30,7 +33,17 @@ public class UserProjector implements IUserProjector {
         }
         return userRepoSlave.findById(id);
     }
+    public void onEvent(Iterable<User> event) {
+        if (listener != null) {
+            listener.onData(event);
+        }
+    }
 
+    public void onComplete() {
+        if (listener != null) {
+            listener.processComplete();
+        }
+    }
     @Override
     public Iterable<User> getAll() {
         if (!temp.isEmpty()) {
@@ -48,6 +61,7 @@ public class UserProjector implements IUserProjector {
         } catch (Exception e) {
             LOGGER.info(e.getMessage() + e.getStackTrace());
         }
+        onEvent(getAll());
     }
 
     @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "filterUserDeleteKLCF")
@@ -58,5 +72,6 @@ public class UserProjector implements IUserProjector {
         } catch (Exception e) {
             LOGGER.info(e.getMessage() + e.getStackTrace());
         }
+        onEvent(getAll());
     }
 }
