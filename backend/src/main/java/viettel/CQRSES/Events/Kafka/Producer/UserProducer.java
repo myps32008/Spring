@@ -5,6 +5,8 @@
  */
 package viettel.CQRSES.Events.Kafka.Producer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,36 +22,17 @@ import viettel.CQRSES.Events.BaseEvent;
 public class UserProducer implements IUserProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserProducer.class);
-    private final KafkaTemplate<String, User> userKafkaTemplate;
     private final KafkaTemplate<String, String> kafkaTemplate;
     @Value(value = "${message.topic.name}")
     private String topicName;
 
-    public UserProducer(KafkaTemplate<String, User> userKafkaTemplate, KafkaTemplate<String, String> kafkaTemplate) {
-        this.userKafkaTemplate = userKafkaTemplate;
+    public UserProducer(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
-
-    public void sendMessageInsertUser(BaseEvent<User> eventUser) {
-        ListenableFuture<SendResult<String, User>> future =
-                userKafkaTemplate.send(topicName, eventUser.getId(), eventUser.getValue());
-
-        future.addCallback(new ListenableFutureCallback<SendResult<String, User>>() {
-
-            @Override
-            public void onSuccess(SendResult<String, User> result) {
-                LOGGER.info("Success: " + result.getRecordMetadata());
-            }
-
-            @Override
-            public void onFailure(Throwable ex) {
-                LOGGER.info("Failure: " + ex.getMessage() + ex.getStackTrace());
-            }
-        });
-    }
-    public void sendMessageDeleteUser(BaseEvent<String> eventUser) {
+    @Override
+    public void sendMessage(BaseEvent eventUser) {
         ListenableFuture<SendResult<String, String>> future =
-                kafkaTemplate.send(topicName, eventUser.getId(), eventUser.getValue());
+                kafkaTemplate.send(topicName, eventUser.getId(), toJson(eventUser.getValue()));
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 
@@ -63,5 +46,14 @@ public class UserProducer implements IUserProducer {
                 LOGGER.info("Failure: " + ex.getMessage() + ex.getStackTrace());
             }
         });
+    }
+    private String toJson(Object object){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
