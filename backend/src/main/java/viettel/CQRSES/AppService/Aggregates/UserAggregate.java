@@ -25,33 +25,34 @@ public class UserAggregate implements IUserAggregate {
         this.repoMaster = repoMaster;
         this.userProducer = userProducer;
     }
+    @Override
     public User handleCreateUser(User user) {
         try {
             repoMaster.save(user);
+            BaseEvent event = new BaseEvent();
+            event.setId(UserManagementCommand.INSERT_USER.toString());
+            event.setValue(user);
+            userProducer.sendMessage(event);
+            return user;
         } catch (Exception ex) {
             LOGGER.info(ex.getMessage());
             return null;
         }
-        BaseEvent event = new BaseEvent();
-        event.setId(UserManagementCommand.INSERT_USER.toString());
-        event.setValue(user);
-        userProducer.sendMessage(event);
-        return user;
     }
+    @Override
     public boolean handleDelete(int id) {
-        User user;
         try {
-            user = repoMaster.getOne(id);
-            repoMaster.deleteById(id);
+            User user = repoMaster.getOne(id);
+            if (user != null) {
+                repoMaster.deleteById(id);
+                BaseEvent event = new BaseEvent();
+                event.setId(UserManagementCommand.DELETE_USER.toString());
+                event.setValue(String.valueOf(id));
+                userProducer.sendMessage(event);
+            }
         } catch (Exception ex) {
             LOGGER.info(ex.getMessage());
             return false;
-        }
-        if (user != null) {
-            BaseEvent event = new BaseEvent();
-            event.setId(UserManagementCommand.DELETE_USER.toString());
-            event.setValue(String.valueOf(id));
-            userProducer.sendMessage(event);
         }
         return true;
     }

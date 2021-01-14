@@ -32,7 +32,7 @@ public class UserProducer implements IUserProducer {
     @Override
     public void sendMessage(BaseEvent eventUser) {
         ListenableFuture<SendResult<String, String>> future =
-                kafkaTemplate.send(topicName, eventUser.getId(), toJson(eventUser.getValue()));
+                kafkaTemplate.send(topicName, eventUser.getId(), toJson(eventUser));
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 

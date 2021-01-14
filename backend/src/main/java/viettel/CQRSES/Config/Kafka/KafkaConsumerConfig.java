@@ -15,6 +15,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import viettel.CQRSES.Domain.Entities.User;
+import viettel.CQRSES.Events.BaseEvent;
 import viettel.CQRSES.Events.UserManagementCommand;
 
 import java.util.HashMap;
@@ -29,50 +30,43 @@ public class KafkaConsumerConfig {
 
     private String GROUP_ID = "USER_SERVICE";
 
-    @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                bootstrapAddress);
-        props.put(
-                ConsumerConfig.GROUP_ID_CONFIG,
-                GROUP_ID);
-        props.put(
-                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
-        props.put(
-                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                StringDeserializer.class);
-        return new DefaultKafkaConsumerFactory<>(props);
-    }
-    public ConsumerFactory<String, User> userConsumerFactory() {
+//    @Bean
+//    public ConsumerFactory<String, String> consumerFactory() {
+//        Map<String, Object> props = new HashMap<>();
+//        props.put(
+//                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+//                bootstrapAddress);
+//        props.put(
+//                ConsumerConfig.GROUP_ID_CONFIG,
+//                GROUP_ID);
+//        props.put(
+//                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+//                StringDeserializer.class);
+//        props.put(
+//                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+//                StringDeserializer.class);
+//        return new DefaultKafkaConsumerFactory<>(props);
+//    }
+    public ConsumerFactory<String, BaseEvent> eventConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "greeting");
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(User.class));
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(BaseEvent.class));
     }
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String>
-            kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, BaseEvent>
+            eventKLCF() {
 
-        ConcurrentKafkaListenerContainerFactory<String, String> factory
+        ConcurrentKafkaListenerContainerFactory<String, BaseEvent> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(eventConsumerFactory());
         return factory;
     }
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> filterUserInsertKLCF() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = kafkaListenerContainerFactory();
-        factory.setRecordFilterStrategy(record -> record.key()
-                .equals(UserManagementCommand.INSERT_USER.toString()));
-        return factory;
-    }
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> filterUserDeleteKLCF() {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = kafkaListenerContainerFactory();
-        factory.setRecordFilterStrategy(record -> !record.key()
-                .equals(UserManagementCommand.DELETE_USER.toString()));
-        return factory;
-    }
+//    @Bean
+//    public ConcurrentKafkaListenerContainerFactory<String, String> filterUserInsertKLCF() {
+//        ConcurrentKafkaListenerContainerFactory<String, String> factory = kafkaListenerContainerFactory();
+//        factory.setRecordFilterStrategy(record -> !record.key()
+//                .startsWith(UserManagementCommand.INSERT_USER.toString()));
+//        return factory;
+//    }
 }

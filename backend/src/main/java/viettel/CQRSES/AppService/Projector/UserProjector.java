@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import viettel.CQRSES.Domain.Contracts.Projectors.IUserProjector;
 import viettel.CQRSES.Domain.Contracts.RepoSlave.IUserRepoSlave;
 import viettel.CQRSES.Domain.Entities.User;
+import viettel.CQRSES.Events.BaseEvent;
 import viettel.CQRSES.Events.IEventListener;
+import viettel.CQRSES.Events.UserManagementCommand;
 
 import java.util.*;
 
@@ -33,6 +35,14 @@ public class UserProjector implements IUserProjector {
         }
         return userRepoSlave.findById(id);
     }
+
+    @Override
+    public Iterable<User> getAll() {
+        if (!temp.isEmpty()) {
+            return temp.values();
+        }
+        return userRepoSlave.findAll();
+    }
     public void onEvent(Iterable<User> event) {
         if (listener != null) {
             listener.onData(event);
@@ -44,34 +54,37 @@ public class UserProjector implements IUserProjector {
             listener.processComplete();
         }
     }
-    @Override
-    public Iterable<User> getAll() {
-        if (!temp.isEmpty()) {
-            return temp.values();
-        }
-        return userRepoSlave.findAll();
-    }
 
-    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "filterUserInsertKLCF")
-    private void listenInsert(String message) {
-        ObjectMapper mapper = new ObjectMapper();
+    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "eventKLCF")
+    private void listener(BaseEvent message) {
         try {
-            User user = mapper.readValue(message, User.class);
-            temp.put(String.valueOf(user.getId()), user);
+            ObjectMapper mapper = new ObjectMapper();
+            switch (UserManagementCommand.valueOf(message.getId())){
+                case INSERT_USER:
+                    User user = mapper.convertValue(message.getValue(), User.class) ;
+                    temp.put(String.valueOf(user.getId()), user);
+                    break;
+                case DELETE_USER:
+                    temp.remove(message.getValue());
+                    break;
+                default:
+                    break;
+            }
+
         } catch (Exception e) {
             LOGGER.info(e.getMessage() + e.getStackTrace());
         }
         onEvent(getAll());
     }
 
-    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "filterUserDeleteKLCF")
-    private void listenDelete(String message) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            temp.remove(message);
-        } catch (Exception e) {
-            LOGGER.info(e.getMessage() + e.getStackTrace());
-        }
-        onEvent(getAll());
-    }
+//    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "filterUserDeleteKLCF")
+//    private void listenDelete(String message) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        try {
+//            temp.remove(message);
+//        } catch (Exception e) {
+//            LOGGER.info(e.getMessage() + e.getStackTrace());
+//        }
+//        onEvent(getAll());
+//    }
 }
