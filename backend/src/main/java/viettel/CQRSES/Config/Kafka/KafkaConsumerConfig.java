@@ -62,6 +62,15 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(eventConsumerFactory());
         return factory;
     }
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, BaseEvent>
+    eventFilterKLCF() {
+        ConcurrentKafkaListenerContainerFactory<String, BaseEvent> factory
+                = eventKLCF();
+        factory.setRecordFilterStrategy(record -> !record.key()
+                .startsWith(UserManagementCommand.INSERT_USER.toString()));
+        return factory;
+    }
 //    @Bean
 //    public ConcurrentKafkaListenerContainerFactory<String, String> filterUserInsertKLCF() {
 //        ConcurrentKafkaListenerContainerFactory<String, String> factory = kafkaListenerContainerFactory();
