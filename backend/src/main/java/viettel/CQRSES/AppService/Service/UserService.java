@@ -23,7 +23,7 @@ public class UserService implements IUserService {
         return userAggregate.handleCreateUser(user);
     }
     @Override
-    public boolean handleDelete(int id) {
+    public boolean handleDelete(String id) {
         return userAggregate.handleDelete(id);
     }
     @Override

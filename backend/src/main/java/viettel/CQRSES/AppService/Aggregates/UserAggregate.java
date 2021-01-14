@@ -40,14 +40,15 @@ public class UserAggregate implements IUserAggregate {
         }
     }
     @Override
-    public boolean handleDelete(int id) {
+    public boolean handleDelete(String id) {
         try {
-            User user = repoMaster.getOne(id);
+            int idUser = Integer.parseInt(id);
+            User user = repoMaster.getOne(idUser);
             if (user != null) {
-                repoMaster.deleteById(id);
+                repoMaster.deleteById(idUser);
                 BaseEvent event = new BaseEvent();
                 event.setId(UserManagementCommand.DELETE_USER.toString());
-                event.setValue(String.valueOf(id));
+                event.setValue(id);
                 userProducer.sendMessage(event);
             }
         } catch (Exception ex) {

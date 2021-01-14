@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -29,6 +31,7 @@ public class UserController {
         return Mono.just(userService.getAll());
     }
     @GetMapping(path="/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @CrossOrigin
     public Flux<String> stream() {
         return this.bridgeAllData.map(event -> {
             try {
@@ -44,6 +47,10 @@ public class UserController {
         User user = new User();
         user.setUserName(RandomString.make(10));
         return Mono.just(userService.handleInsert(user));
+    }
+    @GetMapping(path="/delete/{id}")
+    public Mono<Boolean> delete(@PathVariable("id") String id) {
+        return Mono.just(userService.handleDelete(id));
     }
     private Flux<Iterable<User>> createBridge() {
         Flux<Iterable<User>> bridge = Flux.create(sink -> {

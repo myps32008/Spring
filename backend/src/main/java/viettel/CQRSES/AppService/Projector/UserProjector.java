@@ -21,8 +21,10 @@ public class UserProjector implements IUserProjector {
     private Map<String, User> temp = new HashMap<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(UserProjector.class);
     private IEventListener listener;
-    public UserProjector(IUserRepoSlave userRepoSlave) {
+    private final ObjectMapper mapper;
+    public UserProjector(IUserRepoSlave userRepoSlave, ObjectMapper mapper) {
         this.userRepoSlave = userRepoSlave;
+        this.mapper = mapper;
     }
     public void register(IEventListener listener){
         this.listener = listener;
@@ -55,10 +57,9 @@ public class UserProjector implements IUserProjector {
         }
     }
 
-    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "eventKLCF")
-    private void listener(BaseEvent message) {
+    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "eventUser_CD_KLCF")
+    private void listenerInsert(BaseEvent message) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
             switch (UserManagementCommand.valueOf(message.getId())){
                 case INSERT_USER:
                     User user = mapper.convertValue(message.getValue(), User.class) ;
@@ -70,21 +71,9 @@ public class UserProjector implements IUserProjector {
                 default:
                     break;
             }
-
         } catch (Exception e) {
             LOGGER.info(e.getMessage() + e.getStackTrace());
         }
         onEvent(getAll());
     }
-
-//    @KafkaListener(topics = "${message.topic.name}", groupId = "USER_SERVICE", containerFactory = "filterUserDeleteKLCF")
-//    private void listenDelete(String message) {
-//        ObjectMapper mapper = new ObjectMapper();
-//        try {
-//            temp.remove(message);
-//        } catch (Exception e) {
-//            LOGGER.info(e.getMessage() + e.getStackTrace());
-//        }
-//        onEvent(getAll());
-//    }
 }

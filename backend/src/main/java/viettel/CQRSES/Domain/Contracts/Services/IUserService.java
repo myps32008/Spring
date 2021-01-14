@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface IUserService {
     User handleInsert (User user);
-    boolean handleDelete(int id);
+    boolean handleDelete(String id);
     Iterable<User> getAll();
     Optional<User> findById (int id);
     void register(IEventListener listener);

@@ -1,4 +1,6 @@
 import { Form, Input, Button, Checkbox, Table } from 'antd';
+import Item from 'antd/lib/list/Item';
+import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import http from '../../utils/http.client.js';
@@ -12,7 +14,7 @@ const Test = (props: any) => {
 
   const [dataSource, setDataSource] = useState([]);
 
-  const columns = [
+  const columns: any = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -20,32 +22,51 @@ const Test = (props: any) => {
     },
     {
       title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'username',
+      key: 'username',
     },
     {
       title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    ,
+    {
+      title: 'operation',
+      dataIndex: 'operation',
+      render: (text: String, record: any, index: number) => {
+        return <><Button onClick={() => handleDelete(record.id)} key={record.id}>Delete</Button></>
+      },
     },
   ];
-  const socket = new WebSocket('ws://localhost:3000/ws/profiles'); 
+  const handleDelete = async (id: number) => {
+    const result = await Axios.get('https://localhost:8080/api/users/delete/' + id)
+    debugger    
+  }
+  const socket = new WebSocket('ws://localhost:8080/ws/api/users/stream');
   const reactive = async () => {
-    const response = await fetch('http://localhost:3000/profiles');
-    const data = await response.json();
-    setDataSource(data);    
-    socket.addEventListener('message', async (event: any) => { 
-      setDataSource(event); 
-    });
+    // const eventSource = new EventSource('http://localhost:8080/api/users/stream');
+    // eventSource.onopen = (event: any) => console.log('open', event);
+    // eventSource.onmessage = (event: any) => {
+    //   const data = JSON.parse(event.data);
+    //   const count = data.length;
+    //   for (let index = 0; index < count; index++) {
+    //     data[index].key = data[index].id;        
+    //   }
+    //   // debugger;      
+    //   setDataSource(data);
+    // };
+    // eventSource.onerror = (event: any) => {
+    //   console.log('error', event)
+    // };       
+    socket.addEventListener('message', async (event: any) => {
+      debugger;
+      setDataSource(event);
+    });    
   }
   useEffect(() => {
     reactive();
-    http.internal
-      .get("/api/users/getAll")
-      .then(result => {
-        setDataSource(result.data);
-      });
-  }, []);
+  }, [dataSource]);
 
   return (
     <>
