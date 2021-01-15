@@ -4,6 +4,8 @@ import Axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import http from '../../utils/http.client.js';
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
 
 const Test = (props: any) => {
   const dispatch = useDispatch();
@@ -43,29 +45,29 @@ const Test = (props: any) => {
     const result = await Axios.get('https://localhost:8080/api/users/delete/' + id)
     debugger    
   }
-  const socket = new WebSocket('ws://localhost:8080/ws/api/users/stream');
-  const reactive = async () => {
-    // const eventSource = new EventSource('http://localhost:8080/api/users/stream');
-    // eventSource.onopen = (event: any) => console.log('open', event);
-    // eventSource.onmessage = (event: any) => {
-    //   const data = JSON.parse(event.data);
-    //   const count = data.length;
-    //   for (let index = 0; index < count; index++) {
-    //     data[index].key = data[index].id;        
-    //   }
-    //   // debugger;      
-    //   setDataSource(data);
-    // };
-    // eventSource.onerror = (event: any) => {
-    //   console.log('error', event)
-    // };       
-    socket.addEventListener('message', async (event: any) => {
-      debugger;
-      setDataSource(event);
-    });    
-  }
+  var stompClient: any = null;
+  function connect() {
+    var socket = new SockJS('http://localhost:8080/gs-guide-websocket');
+    stompClient = Stomp.over(socket);  
+    stompClient.connect({}, function(frame : any) {
+        
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('http://localhost:8080/topic/messages', (messageOutput: any) => {
+          debugger;
+            const data = JSON.parse(messageOutput.body);
+        });
+    });
+}
+
+function disconnect() {
+    if(stompClient != null) {
+        stompClient.disconnect();
+    }
+    
+    console.log("Disconnected");
+}
   useEffect(() => {
-    reactive();
+    connect();
   }, [dataSource]);
 
   return (

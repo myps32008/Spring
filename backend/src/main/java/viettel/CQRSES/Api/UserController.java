@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +31,10 @@ public class UserController {
     public Mono<Iterable<User>> getListUsers() {
         return Mono.just(userService.getAll());
     }
-    @GetMapping(path="/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+
+
     @CrossOrigin
+    @SendTo("/topic/messages")
     public Flux<String> stream() {
         return this.bridgeAllData.map(event -> {
             try {

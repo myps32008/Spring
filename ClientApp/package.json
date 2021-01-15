@@ -15,7 +15,9 @@
     "react-jwt": "^1.0.7",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.0"
+    "react-scripts": "4.0.0",
+    "sockjs-client": "^1.5.0",
+    "stompjs": "^2.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,6 +43,8 @@
   "devDependencies": {
     "@types/react-redux": "^7.1.11",
     "@types/react-router-dom": "^5.1.6",
+    "@types/sockjs-client": "^1.5.0",
+    "@types/stompjs": "^2.3.4",
     "typescript": "^4.0.5"
   }
 }
