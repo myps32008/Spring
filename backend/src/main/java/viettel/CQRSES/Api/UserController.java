@@ -24,7 +24,7 @@ public class UserController {
     public UserController(IUserService userService, ObjectMapper mapper) {
         this.userService = userService;
         this.mapper = mapper;
-        bridgeAllData = createBridge().publish().autoConnect().cache(10).log();
+        bridgeAllData = createBridge().share();
     }
     @GetMapping(path="/all")
     public Mono<Iterable<User>> getListUsers() {
