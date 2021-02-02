@@ -1,0 +1,3 @@
+https://www.confluent.io/blog/making-sense-of-stream-processing/
+https://www.confluent.io/blog/event-sourcing-using-apache-kafka/
+https://complexevents.com/2020/06/15/whats-the-difference-between-esp-and-cep-2/

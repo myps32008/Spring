@@ -6,6 +6,7 @@
 package viettel.CQRSES.Config.DbConnection;
 
 //import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.*;
@@ -26,14 +27,17 @@ import java.util.HashMap;
         transactionManagerRef = "repoSlaveTransactionManager")
 public class SlaveDbSourceConfig {
     private final Environment env;
+
     public SlaveDbSourceConfig(Environment env) {
         this.env = env;
     }
+
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource slaveDataSource() {
         return DataSourceBuilder.create().build();
     }
+
     @Bean
     public LocalContainerEntityManagerFactoryBean repoSlaveEntityManager() {
         final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
@@ -43,7 +47,7 @@ public class SlaveDbSourceConfig {
         final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         final HashMap<String, Object> properties = new HashMap<String, Object>();
-//      properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
         properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
         em.setJpaPropertyMap(properties);
 
